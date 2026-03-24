@@ -32,7 +32,7 @@
     }
 
     document.addEventListener("alpine:init", () => {
-        Alpine.store("repoUrl", "https://raw.githubusercontent.com/zosetsu-repo/tachi-repo/repo");
+        Alpine.store("repoUrl", "https://raw.githubusercontent.com/yuzono/cursed-manga-repo/repo");
 
         Alpine.data("extensionList", () => ({
             LoadingStatus,
