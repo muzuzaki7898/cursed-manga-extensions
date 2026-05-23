@@ -764,4 +764,4 @@ class Hitomi(
 
 const val IMAGE_LOOPBACK_HOST = "127.0.0.1"
 const val IMAGE_THUMBNAIL = "is_thumbnail"
-const val IMAGE_GIF = "is_gif" 
+const val IMAGE_GIF = "is_gif"
