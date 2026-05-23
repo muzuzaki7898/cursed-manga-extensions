@@ -3,6 +3,7 @@ package eu.kanade.tachiyomi.extension.all.hitomi
 import android.util.Log
 import eu.kanade.tachiyomi.network.GET
 import eu.kanade.tachiyomi.network.await
+import eu.kanade.tachiyomi.source.model.Filter
 import eu.kanade.tachiyomi.source.model.FilterList
 import eu.kanade.tachiyomi.source.model.MangasPage
 import eu.kanade.tachiyomi.source.model.Page
@@ -99,7 +100,24 @@ class Hitomi(
         }
     }
 
-    override fun getFilterList() = getFilters()
+    // ==========================================
+    // FILTER CUSTOM BUATAN (TAG & ACAK)
+    // ==========================================
+    private val customTags = arrayOf("Pilih Tag...", "futanari", "yuri", "milf", "incest", "netorare", "mind break", "romance", "schoolgirl")
+    private class CustomTagFilter(tags: Array<String>) : Filter.Select<String>("Pilih Tag Cepat", tags)
+    private class CustomRandomFilter : Filter.CheckBox("Acak Hasil Komik", false)
+
+    override fun getFilterList(): FilterList {
+        val originalFilters = getFilters().list
+        return FilterList(
+            Filter.Header("--- FITUR PILIH TAG & ACAK ---"),
+            CustomTagFilter(customTags),
+            CustomRandomFilter(),
+            Filter.Separator(),
+            *originalFilters.toTypedArray(),
+        )
+    }
+    // ==========================================
 
     private fun Int.nextPageRange(): LongRange {
         val byteOffset = ((this - 1) * 25) * 4L
@@ -153,9 +171,20 @@ class Hitomi(
 
         filters.forEach {
             when (it) {
+                is CustomTagFilter -> {
+                    if (it.state > 0) {
+                        val selectedTag = customTags[it.state].lowercase().replace(" ", "_")
+                        terms += "tag:$selectedTag"
+                    }
+                }
+                is CustomRandomFilter -> {
+                    if (it.state) {
+                        random = true
+                    }
+                }
                 is SelectFilter -> {
                     sortBy = Pair(it.getArea(), it.getValue())
-                    random = (it.vals[it.state].first == "Random")
+                    if (it.vals[it.state].first == "Random") random = true
                 }
 
                 is TypeFilter -> {
